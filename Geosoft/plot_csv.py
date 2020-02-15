@@ -6,14 +6,16 @@ import sys
 
 ### CONFIG ####################################################################
 
-xy_pair = ("CYC/K_unit", "Ln_P")
+xy_pair = ("CYC/K_unit", "Ln_P", "5_DEPTH")
 
 ###############################################################################
 
-def prompt_user(lims):
+def prompt_user(limlist):
 
-    if lims != []:
-        print("optional arguments --samex, --samey")
+    if limlist == []:
+	    print("optional argument --depth")
+    else:
+        print("optional arguments --samex, --samey, --depth")
     user_input = input("file path: ")
     path = re.findall(r"^(.+\.csv)", user_input)[0]
     title = re.findall(r"\\([^\\]+)\.csv", path)[0]
@@ -24,46 +26,58 @@ def prompt_user(lims):
         arglist = []
 
     df = pd.read_csv(path)
-    fig = plt.figure()
+    fig = plt.figure(title, figsize=(9, 6))
     plt.ion()
-    plt.title(title)
+    #fig.suptitle(title)
+    
+    if "--depth" in arglist:
+        plt.subplot(2, 1, 1)
     plt.xlabel(xy_pair[0])
     plt.ylabel(xy_pair[1])
-    plt.plot(df[xy_pair[0]], df[xy_pair[1]])
+    plt.scatter(df[xy_pair[0]], df[xy_pair[1]], c="g", s=12)
+    plt.title("Frequency Spectrum")
+    plt.grid()
 
     if "--samex" in arglist:
-        plt.xlim(lims[0])
+        plt.xlim(limlist[0][0])
 
     if "--samey" in arglist:
-        plt.ylim(lims[1])
+        plt.ylim(limlist[0][1])
 
     if "--depth" in arglist:
-        x = df[xy_pair[0]]
-        y = df[xy_pair[2]]
-        dydx = np.diff(y) / np.diff(x)
-        depth = (-1/2) * dydx
-        plt.plot(x, depth)
+        plt.subplot(2, 1, 2)
+        depth = df[xy_pair[2]][2:-2].astype("float64")
+        plt.scatter(df[xy_pair[0]][2:-2], depth, c="r", s=12)
+        #plt.xlim(xlim)
+        plt.title("Mean Depth to Source")
+        plt.xlabel(xy_pair[0])
+        plt.ylabel("depth (K_unit)")
+        plt.grid()
+        if "--samex" in arglist:
+            plt.xlim(limlist[1][0])
 
-    axes = fig.axes[0]
-    xlim = axes.get_xlim()
-    ylim = axes.get_ylim()
-    lims = [xlim, ylim]
+        if "--samey" in arglist:
+            plt.ylim(limlist[1][1])
 
-    plt.show()
+    axes = fig.axes
+    limlist = [[axes[0].get_xlim(), axes[0].get_ylim()], [axes[1].get_xlim(), axes[1].get_ylim()]]
+
+    fig.tight_layout()
+    fig.show()
 
     answer = input("\nexit or plot?\n")
-    return (answer, lims)
+    return (answer, limlist)
 
 ### MAIN #######################################################################
 
-lims = []
-response = prompt_user(lims)
+limlist = []
+response = prompt_user(limlist)
 answer = response[0]
-lims = response[1]
+limlist = response[1]
 
 while answer != "exit":
-    response = prompt_user(lims)
+    response = prompt_user(limlist)
     answer = response[0]
-    lims = response[1]
+    limlist = response[1]
 
 plt.close("all")

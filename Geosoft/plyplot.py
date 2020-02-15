@@ -42,9 +42,7 @@ def write_draw_gs(map_path, ply_path, write_path):
 def rungx():
 
     proj = gxproj.Geosoft_project()
-
     map_path = proj.current_map
-
     gxapi.GXSYS.set_interactive(0)
     ply_list = next(os.walk(input_folder))[2]
 

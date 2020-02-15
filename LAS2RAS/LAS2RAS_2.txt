@@ -1,0 +1,47 @@
+### Copy and paste this script into the ArcMap Python terminal.
+### Created by Jonny Norwine in 2019.
+### Last updated: 
+
+import arcpy
+import os  
+import re
+
+### SETUP ############################################
+
+# full path of the folder where you want to save .lasd file 
+# USE DOUBLE BACKSLASH AND END WITH DOUBLE BACKSLASH
+# e.g. "E:\\jnorwine\\ArcMap\\Rifts\\"
+#
+lasd_output_path = "E:\\Caitlin\\PIPERS\\LiDAR_LAS_Dataset\\"
+raster_output_path = "E:\\Caitlin\\PIPERS\\LiDAR_Rasters\\"
+
+
+# full path of the geodatabase where you want to save the raster
+# USE DOUBLE BACKSLASH AND END WITH DOUBLE BACKSLASH
+# e.g. "E:\\jnorwine\\ArcMap\\Rifts\\ROSETTA_Rifts.gdb\\"
+#
+output_gdb_path = "E:\\Caitlin\\ROSETTA\\ROSETTA Database\\ROSETTA.gdb\\"
+
+
+# path to folder of record files
+input_folder = "C:\\Users\\caitlin\\Desktop\\AN03_F1004\\"
+
+#######################################################
+
+file_list = next(os.walk(input_folder))[2]
+prog = 0
+
+for file in file_list:
+
+     prog += 1
+     print("working on " + file + "(" + str(prog) + "/" + str(len(file_list)) + ")" + "...")
+     name = re.search(r"(.+)\.", file).group(1)
+     path_list = [os.path.join(input_folder, file)]     
+
+     try:
+	  arcpy.CreateLasDataset_management(path_list, lasd_output_path + name + ".lasd", "NO_RECURSION", "", arcpy.SpatialReference(4326), "COMPUTE_STATS", "RELATIVE_PATHS", "NO_FILES")
+	  arcpy.LasDatasetToRaster_conversion(lasd_output_path + name + ".lasd", output_gdb_path + name, "ELEVATION", 'BINNING AVERAGE SIMPLE', 'FLOAT', 'CELLSIZE', 0.00001, 1)
+     except:
+	  arcpy.CreateLasDataset_management(path_list, lasd_output_path + name "_1" + ".lasd", "NO_RECURSION", "", arcpy.SpatialReference(4326), "COMPUTE_STATS", "RELATIVE_PATHS", "NO_FILES")
+	  arcpy.LasDatasetToRaster_conversion(lasd_output_path + name + "_1" + ".lasd", output_gdb_path + name, "ELEVATION", 'BINNING AVERAGE SIMPLE', 'FLOAT', 'CELLSIZE', 0.00001, 1)
+   

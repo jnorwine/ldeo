@@ -8,8 +8,8 @@ from tqdm import tqdm
 
 ### CONFIG ################################################################
 
-input = "G:\\jnorwine\\polygrid1\\spc"
-output = "G:\\jnorwine\\polygrid1\\spc\\processed\\"
+input = "G:\\jnorwine\\polygrid1\\spc\\gravity\\regrid5km\\"
+output = "G:\\jnorwine\\polygrid1\\spc\\gravity\\regrid5km\\processed\\"
 
 ###########################################################################
 
