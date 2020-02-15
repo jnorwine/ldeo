@@ -43,6 +43,8 @@ for file in file_list:
         name = re.search(r"(.+)\.", file).group(1)
         if os.path.exists(lasd_output_path + name + ".lasd"):
             conflict = 1
+            break
+
 if conflict == 1:
     print("Some of the output files already exist.")
     print("[1] Skip these files")
